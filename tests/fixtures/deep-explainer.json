@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "audience": "ai_graduate_developer",
+  "paper_info": {
+    "title": "Efficient Multi-Scale Model",
+    "problem": "Existing models are accurate but too expensive for deployment.",
+    "authors": ["Ada Lovelace", "Alan Turing"],
+    "institutions": ["Analytical Engine Lab"],
+    "venue": "TestConf 2026",
+    "published": "2026-01-01",
+    "links": {
+      "arxiv": "https://arxiv.org/abs/2601.00001",
+      "doi": "10.0000/example",
+      "code": "https://example.test/code",
+      "project": "https://example.test/project"
+    }
+  },
+  "innovations": [
+    {
+      "title": "Factorized multi-scale attention",
+      "summary": "The model separates spatial and temporal attention while sharing a compact backbone.",
+      "evidence_pages": [3]
+    },
+    {
+      "title": "Unified task decoder",
+      "summary": "A shared decoder handles detection, prediction, and reconstruction outputs.",
+      "evidence_pages": [5]
+    },
+    {
+      "title": "Annotation-efficient pipeline",
+      "summary": "The training pipeline combines sparse depth and semantic labels.",
+      "evidence_pages": [7]
+    }
+  ],
+  "method": {
+    "overview": "Images pass through a shared encoder before factorized spatial and temporal attention.",
+    "steps": [
+      {
+        "title": "Shared encoder",
+        "detail": "The encoder converts multi-camera images into shared latent tokens.",
+        "evidence_pages": [3]
+      },
+      {
+        "title": "Spatial fusion",
+        "detail": "Spatial attention exchanges information across camera views.",
+        "evidence_pages": [4]
+      },
+      {
+        "title": "Temporal fusion",
+        "detail": "Temporal attention aggregates observations from neighboring frames.",
+        "evidence_pages": [4]
+      },
+      {
+        "title": "Task decoding",
+        "detail": "Task-specific heads produce geometry, semantics, and reconstruction.",
+        "evidence_pages": [5]
+      }
+    ],
+    "formulas": [
+      {
+        "latex": "A = softmax(QK^T / sqrt(d))V",
+        "explanation": "Attention combines projected tokens while scaling by the channel dimension.",
+        "evidence_pages": [4]
+      },
+      {
+        "latex": "L = L_task + lambda L_geo",
+        "explanation": "The objective balances task supervision and geometric consistency.",
+        "evidence_pages": [6]
+      }
+    ]
+  },
+  "experiments": {
+    "setup": "Evaluated on two driving datasets against four baselines.",
+    "main_results": [
+      {
+        "claim": "Depth error drops to 0.28.",
+        "value": "0.28",
+        "evidence_pages": [8]
+      },
+      {
+        "claim": "Occupancy reaches 61.2 mIoU.",
+        "value": "61.2 mIoU",
+        "evidence_pages": [8]
+      }
+    ],
+    "ablations": [
+      {
+        "claim": "Spatial fusion improves mIoU by 3.4 points.",
+        "value": "3.4 points",
+        "evidence_pages": [9]
+      }
+    ],
+    "visual_figures": [
+      "parse_assets/figure.png"
+    ]
+  },
+  "summary": {
+    "value": "The method reduces deployment cost while retaining accuracy.",
+    "applications": ["Autonomous driving", "Robotic perception"],
+    "limitations": ["Evaluated only on driving datasets."],
+    "conclusion": "A practical architecture for efficient multi-view perception."
+  }
+}

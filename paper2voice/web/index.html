@@ -1,0 +1,1203 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Paper2Voice 设置</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", sans-serif;
+    }
+
+    body {
+      --page: #f2f8f1;
+      --panel: #fbfffa;
+      --panel-strong: #ffffff;
+      --ink: #17342a;
+      --muted: #5b7168;
+      --accent: #2f8f63;
+      --accent-soft: #dcefe0;
+      --line: #d3e5d6;
+      --input: #f7fbf7;
+      --danger: #b44d3c;
+      margin: 0;
+      min-width: 320px;
+      background: var(--page);
+      color: var(--ink);
+      transition: background-color 180ms ease, color 180ms ease;
+      overflow-x: hidden;
+    }
+
+    body[data-theme="minimal"] {
+      --page: #f5f6f3;
+      --panel: #fbfcf9;
+      --panel-strong: #ffffff;
+      --ink: #202725;
+      --muted: #66706d;
+      --accent: #386d58;
+      --accent-soft: #e3ebe6;
+      --line: #d9dedb;
+      --input: #f8faf8;
+    }
+
+    body[data-theme="tech"] {
+      color-scheme: dark;
+      --page: #07131a;
+      --panel: #0d2029;
+      --panel-strong: #102730;
+      --ink: #e5f8f0;
+      --muted: #8bb1a8;
+      --accent: #42d6b2;
+      --accent-soft: #153b3d;
+      --line: #1d3a43;
+      --input: #0a1b23;
+      --danger: #ff8f7a;
+    }
+
+    * { box-sizing: border-box; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .topbar {
+      height: 64px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 max(24px, calc((100vw - 1180px) / 2));
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: var(--accent);
+      position: relative;
+    }
+
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: var(--panel);
+      border-radius: 2px;
+      right: 6px;
+      top: 6px;
+    }
+
+    .health {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .health-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    main {
+      width: min(1180px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 44px 0 88px;
+    }
+
+    .page-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 46px);
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .head-meta {
+      color: var(--muted);
+      font-size: 13px;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .workspace, .primary, .panel {
+      min-width: 0;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 390px;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .primary { display: grid; gap: 22px; }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 26px;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .panel-index {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 21px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    .panel-note {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .theme-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .theme-option {
+      display: block;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: var(--panel-strong);
+      cursor: pointer;
+      transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    }
+
+    .theme-option:hover { transform: translateY(-1px); }
+    .theme-option:has(input:checked) {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 18%, transparent);
+    }
+
+    .theme-option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .theme-preview {
+      height: 72px;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    .preview-cinematic {
+      background:
+        linear-gradient(90deg, rgba(6, 12, 13, 0.96) 0 56%, rgba(6, 12, 13, 0.22)),
+        #17201f;
+      color: #f0d79b;
+      border: 1px solid #5b4728;
+    }
+    .preview-green { background: #e8f3e8; color: #17342a; }
+    .preview-minimal { background: #f1f1ed; color: #202725; border: 1px solid #dedfd9; }
+    .preview-tech { background: #081820; color: #dff9f0; }
+
+    .preview-line {
+      height: 4px;
+      width: 42%;
+      border-radius: 2px;
+      background: currentColor;
+      opacity: 0.9;
+    }
+
+    .preview-bars { display: flex; gap: 5px; }
+    .preview-bars span { height: 20px; flex: 1; border-radius: 2px; }
+    .preview-cinematic .preview-bars span { background: #e6b24e; }
+    .preview-cinematic .preview-bars span:first-child { background: #49d6cd; }
+    .preview-green .preview-bars span { background: #75b88d; }
+    .preview-minimal .preview-bars span { background: #8b9a94; }
+    .preview-tech .preview-bars span { background: #42d6b2; }
+
+    .theme-name {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .theme-check {
+      width: 16px;
+      height: 16px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+    }
+
+    .theme-option:has(input:checked) .theme-check {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .theme-option:has(input:checked) .theme-check::after {
+      content: "";
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--panel);
+    }
+
+    .theme-caption {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .module-option {
+      display: grid;
+      grid-template-columns: 20px 1fr;
+      gap: 11px;
+      align-items: start;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--input);
+      cursor: pointer;
+    }
+
+    .module-option input {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      margin: 1px 0 0;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: var(--panel-strong);
+      display: grid;
+      place-items: center;
+    }
+
+    .module-option input::after {
+      content: "";
+      width: 9px;
+      height: 5px;
+      border-left: 2px solid white;
+      border-bottom: 2px solid white;
+      transform: rotate(-45deg) scale(0);
+    }
+
+    .module-option input:checked {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .module-option input:checked::after { transform: rotate(-45deg) scale(1); }
+
+    .module-title { font-size: 14px; font-weight: 700; }
+    .module-copy { color: var(--muted); font-size: 12px; margin-top: 3px; }
+
+    .schedule {
+      position: sticky;
+      top: 86px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .schedule .panel { padding: 22px; }
+
+    .schedule-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .schedule-title { font-size: 17px; font-weight: 700; }
+    .schedule-sub { color: var(--muted); font-size: 12px; margin-top: 3px; }
+
+    .switch {
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .switch input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .switch-track {
+      width: 42px;
+      height: 24px;
+      border-radius: 12px;
+      background: var(--line);
+      padding: 3px;
+      transition: background 160ms ease;
+    }
+
+    .switch-track::after {
+      content: "";
+      display: block;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--panel-strong);
+      transition: transform 160ms ease;
+    }
+
+    .switch input:checked + .switch-track { background: var(--accent); }
+    .switch input:checked + .switch-track::after { transform: translateX(18px); }
+
+    .field { display: grid; gap: 7px; margin-top: 15px; }
+    .field:first-of-type { margin-top: 0; }
+    .field label, .field-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .control {
+      width: 100%;
+      min-width: 0;
+      height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--input);
+      color: var(--ink);
+      padding: 0 12px;
+      outline: none;
+    }
+
+    .control:focus { border-color: var(--accent); }
+    textarea.control { height: 64px; padding: 10px 12px; resize: vertical; }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .mode-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .mode-option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .mode-option span {
+      display: grid;
+      place-items: center;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--input);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .mode-option input:checked + span {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .day-option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .day-option span {
+      display: grid;
+      place-items: center;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: var(--input);
+      color: var(--muted);
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .day-option input:checked + span {
+      color: var(--panel);
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .inline-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--input);
+      padding: 0 12px;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .button {
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0 16px;
+      font-weight: 700;
+    }
+
+    .button-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--panel);
+    }
+
+    .button-secondary {
+      background: transparent;
+      color: var(--ink);
+    }
+
+    .button:disabled { opacity: 0.55; cursor: wait; }
+
+    .llm-test-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .button-test {
+      min-height: 34px;
+      padding: 0 12px;
+      font-size: 12px;
+      background: transparent;
+      color: var(--accent);
+      border-color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .llm-test-status {
+      min-width: 0;
+      color: var(--muted);
+      font-size: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .llm-test-status.success { color: var(--accent); }
+    .llm-test-status.error { color: var(--danger); }
+
+    .run-status {
+      margin-top: 14px;
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .status-state {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .status-state.running { color: var(--accent); }
+    .status-state.error { color: var(--danger); }
+
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      max-width: min(360px, calc(100vw - 48px));
+      padding: 12px 16px;
+      border-radius: 7px;
+      background: var(--ink);
+      color: var(--panel);
+      font-size: 13px;
+      transform: translateY(18px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 160ms ease, transform 160ms ease;
+      z-index: 20;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    .disabled-group {
+      opacity: 0.48;
+      pointer-events: none;
+    }
+
+    @media (max-width: 920px) {
+      .workspace { grid-template-columns: 1fr; }
+      .schedule { position: static; }
+      .page-head { align-items: start; flex-direction: column; }
+      .head-meta { text-align: left; }
+    }
+
+    @media (max-width: 640px) {
+      main { width: min(100% - 28px, 1180px); padding-top: 28px; }
+      .topbar { padding: 0 16px; }
+      .health { display: none; }
+      .page-head { width: 100%; }
+      .theme-grid, .module-grid { grid-template-columns: 1fr; }
+      .panel { padding: 20px; }
+      .panel-head { flex-direction: column; align-items: flex-start; }
+      .panel-note { text-align: left; }
+      .theme-option, .theme-preview, .control, .inline-toggle { min-width: 0; max-width: 100%; }
+      .field-row, .actions { grid-template-columns: 1fr; }
+      .weekdays { gap: 4px; }
+      .day-option span { height: 32px; }
+    }
+  </style>
+</head>
+<body data-theme="cinematic">
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span>Paper2Voice</div>
+    <div class="health"><span class="health-dot"></span><span>本地调度器</span></div>
+  </header>
+
+  <main>
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Pipeline Control</div>
+        <h1>视频生成设置</h1>
+      </div>
+      <div class="head-meta">
+        <div id="nextRunLabel">下次运行：未安排</div>
+        <div>Asia/Shanghai</div>
+      </div>
+    </div>
+
+    <form id="settingsForm">
+      <div class="workspace">
+        <div class="primary">
+          <section class="panel" aria-labelledby="themeHeading">
+            <div class="panel-head">
+              <div>
+                <div class="panel-index">01</div>
+                <h2 id="themeHeading">视觉主题</h2>
+              </div>
+              <div class="panel-note">成片配色与页面同步</div>
+            </div>
+
+            <div class="theme-grid">
+              <label class="theme-option">
+                <input type="radio" name="theme" value="cinematic">
+                <div class="theme-preview preview-cinematic">
+                  <span class="preview-line"></span>
+                  <span class="preview-bars"><span></span><span></span><span></span></span>
+                </div>
+                <div class="theme-name"><span>光影科技</span><span class="theme-check"></span></div>
+                <div class="theme-caption">深色电影感与全息信息层</div>
+              </label>
+              <label class="theme-option">
+                <input type="radio" name="theme" value="light_green">
+                <div class="theme-preview preview-green">
+                  <span class="preview-line"></span>
+                  <span class="preview-bars"><span></span><span></span><span></span></span>
+                </div>
+                <div class="theme-name"><span>浅绿</span><span class="theme-check"></span></div>
+                <div class="theme-caption">柔和自然</div>
+              </label>
+              <label class="theme-option">
+                <input type="radio" name="theme" value="minimal">
+                <div class="theme-preview preview-minimal">
+                  <span class="preview-line"></span>
+                  <span class="preview-bars"><span></span><span></span><span></span></span>
+                </div>
+                <div class="theme-name"><span>简约风</span><span class="theme-check"></span></div>
+                <div class="theme-caption">低干扰排版</div>
+              </label>
+              <label class="theme-option">
+                <input type="radio" name="theme" value="tech">
+                <div class="theme-preview preview-tech">
+                  <span class="preview-line"></span>
+                  <span class="preview-bars"><span></span><span></span><span></span></span>
+                </div>
+                <div class="theme-name"><span>科技</span><span class="theme-check"></span></div>
+                <div class="theme-caption">高对比深色</div>
+              </label>
+            </div>
+          </section>
+
+          <section class="panel" aria-labelledby="moduleHeading">
+            <div class="panel-head">
+              <div>
+                <div class="panel-index">02</div>
+                <h2 id="moduleHeading">内容模块</h2>
+              </div>
+              <div class="panel-note">固定五章深度讲解结构</div>
+            </div>
+
+            <div class="module-grid">
+              <label class="module-option">
+                <input type="checkbox" name="modules" value="paper_info">
+                <span><span class="module-title">论文信息</span><span class="module-copy">作者、机构、链接与问题定义</span></span>
+              </label>
+              <label class="module-option">
+                <input type="checkbox" name="modules" value="innovation">
+                <span><span class="module-title">创新点</span><span class="module-copy">与已有方法的核心差异</span></span>
+              </label>
+              <label class="module-option">
+                <input type="checkbox" name="modules" value="method">
+                <span><span class="module-title">方法</span><span class="module-copy">架构、数据流、核心公式与训练目标</span></span>
+              </label>
+              <label class="module-option">
+                <input type="checkbox" name="modules" value="experiment">
+                <span><span class="module-title">实验结果</span><span class="module-copy">主结果、消融、效率与可视化</span></span>
+              </label>
+              <label class="module-option">
+                <input type="checkbox" name="modules" value="summary">
+                <span><span class="module-title">总结</span><span class="module-copy">价值、应用、工程代价与局限</span></span>
+              </label>
+            </div>
+          </section>
+        </div>
+
+        <aside class="schedule">
+          <section class="panel" aria-labelledby="scheduleHeading">
+            <div class="schedule-head">
+              <div>
+                <div class="schedule-title" id="scheduleHeading">运行计划</div>
+                <div class="schedule-sub">本地时区 · Asia/Shanghai</div>
+              </div>
+              <label class="switch" title="启用定时运行">
+                <input type="checkbox" id="scheduleEnabled">
+                <span class="switch-track"></span>
+              </label>
+            </div>
+
+            <div class="field">
+              <span class="field-label">视频模式</span>
+              <div class="mode-grid">
+                <label class="mode-option">
+                  <input type="radio" name="videoMode" value="long">
+                  <span>深度长视频</span>
+                </label>
+                <label class="mode-option">
+                  <input type="radio" name="videoMode" value="promo">
+                  <span>60 秒宣发</span>
+                </label>
+              </div>
+            </div>
+
+            <div id="scheduleFields">
+              <div class="field-row">
+                <div class="field">
+                  <label for="scheduleTime">开始时间</label>
+                  <input class="control" type="time" id="scheduleTime" required>
+                </div>
+                <div class="field">
+                  <label for="maxScenes">最多分镜</label>
+                  <input class="control" type="number" id="maxScenes" min="1" max="18" step="1" required>
+                </div>
+              </div>
+
+              <div class="field">
+                <span class="field-label">运行日</span>
+                <div class="weekdays">
+                  <label class="day-option"><input type="checkbox" name="weekday" value="mon"><span>一</span></label>
+                  <label class="day-option"><input type="checkbox" name="weekday" value="tue"><span>二</span></label>
+                  <label class="day-option"><input type="checkbox" name="weekday" value="wed"><span>三</span></label>
+                  <label class="day-option"><input type="checkbox" name="weekday" value="thu"><span>四</span></label>
+                  <label class="day-option"><input type="checkbox" name="weekday" value="fri"><span>五</span></label>
+                  <label class="day-option"><input type="checkbox" name="weekday" value="sat"><span>六</span></label>
+                  <label class="day-option"><input type="checkbox" name="weekday" value="sun"><span>日</span></label>
+                </div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="bundlePath">论文 Bundle 或 arXiv 链接</label>
+              <input class="control" type="text" id="bundlePath" placeholder="https://arxiv.org/abs/2610.30340">
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="tts">配音</label>
+                <select class="control" id="tts">
+                  <option value="sapi">本地 SAPI</option>
+                  <option value="edge">Edge TTS</option>
+                  <option value="cosyvoice">CosyVoice3</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="voice">声音</label>
+                <input class="control" type="text" id="voice" placeholder="默认声音">
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="inline-toggle">
+                <span class="field-label">延续片头音色</span>
+                <span class="switch">
+                  <input type="checkbox" id="voiceCloneEnabled">
+                  <span class="switch-track"></span>
+                </span>
+              </label>
+            </div>
+
+            <div id="voiceCloneFields">
+              <div class="field">
+                <label for="introVideo">片头视频</label>
+                <input class="control" type="text" id="introVideo" placeholder="mode/开头.mp4">
+              </div>
+              <div class="field">
+                <label for="outroVideo">片尾视频</label>
+                <input class="control" type="text" id="outroVideo" placeholder="mode/结尾.mp4">
+              </div>
+              <div class="field">
+                <label for="voiceReferenceVideo">声纹参考视频</label>
+                <input class="control" type="text" id="voiceReferenceVideo" placeholder="留空使用片头视频">
+              </div>
+              <label class="module-option">
+                <input type="checkbox" id="xttsLicenseAccepted">
+                <span>
+                  <span class="module-title">确认 XTTS 许可</span>
+                  <span class="module-copy">非商业 CPML 或已购买商业许可</span>
+                </span>
+              </label>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="resolution">分辨率</label>
+                <select class="control" id="resolution">
+                  <option value="1080x1440">1080 × 1440</option>
+                  <option value="1280x720">1280 × 720</option>
+                  <option value="1920x1080">1920 × 1080</option>
+                  <option value="960x540">960 × 540</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="fps">帧率</label>
+                <select class="control" id="fps">
+                  <option value="24">24 fps</option>
+                  <option value="30">30 fps</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="inline-toggle">
+                <span class="field-label">烧录字幕</span>
+                <span class="switch">
+                  <input type="checkbox" id="subtitles">
+                  <span class="switch-track"></span>
+                </span>
+              </label>
+            </div>
+
+            <div class="field">
+              <label for="outputDir">输出目录</label>
+              <input class="control" type="text" id="outputDir" placeholder="Bundle/video">
+            </div>
+
+            <div class="field">
+              <label class="inline-toggle">
+                <span class="field-label">大模型翻译</span>
+                <span class="switch">
+                  <input type="checkbox" id="translationEnabled">
+                  <span class="switch-track"></span>
+                </span>
+              </label>
+            </div>
+
+            <div id="translationFields">
+              <div class="field">
+                <label for="llmApiUrl">API Base URL</label>
+                <input class="control" type="url" id="llmApiUrl" placeholder="https://api.deepseek.com/v1">
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="llmModel">模型</label>
+                  <input class="control" type="text" id="llmModel" placeholder="deepseek-chat">
+                </div>
+                <div class="field">
+                  <label for="ocrPipelineVersion">OCR 版本</label>
+                  <select class="control" id="ocrPipelineVersion">
+                    <option value="v1.6">OCR 1.6</option>
+                    <option value="v1.5">OCR 1.5</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label for="llmApiKey">API Key</label>
+                <input class="control" type="password" id="llmApiKey" autocomplete="new-password">
+              </div>
+              <div class="llm-test-row">
+                <button class="button button-test" type="button" id="testLlmButton">测试连接</button>
+                <span class="llm-test-status" id="llmTestStatus">尚未测试</span>
+              </div>
+              <div class="field">
+                <label for="translationMaxChars">翻译正文上限</label>
+                <input class="control" type="number" id="translationMaxChars" min="0" step="1000" placeholder="0 表示全文">
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="button button-secondary" type="submit" id="saveButton">保存设置</button>
+              <button class="button button-primary" type="button" id="runButton">立即运行</button>
+            </div>
+
+            <div class="run-status">
+              <div class="status-row">
+                <span>任务状态</span>
+                <span class="status-state" id="jobState">等待运行</span>
+              </div>
+              <div id="jobMessage">配置保存到本地调度器</div>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </form>
+  </main>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    const form = document.querySelector("#settingsForm");
+    const scheduleFields = document.querySelector("#scheduleFields");
+    const scheduleEnabled = document.querySelector("#scheduleEnabled");
+    const voiceCloneEnabled = document.querySelector("#voiceCloneEnabled");
+    const voiceCloneFields = document.querySelector("#voiceCloneFields");
+    const translationEnabled = document.querySelector("#translationEnabled");
+    const translationFields = document.querySelector("#translationFields");
+    const saveButton = document.querySelector("#saveButton");
+    const runButton = document.querySelector("#runButton");
+    const testLlmButton = document.querySelector("#testLlmButton");
+    const llmTestStatus = document.querySelector("#llmTestStatus");
+    const toast = document.querySelector("#toast");
+    let currentSettings = null;
+
+    function applyTheme(theme) {
+      document.body.dataset.theme = theme;
+    }
+
+    function selectedTheme() {
+      return document.querySelector('input[name="theme"]:checked')?.value || "light_green";
+    }
+
+    function setBusy(busy) {
+      saveButton.disabled = busy;
+      runButton.disabled = busy;
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove("show"), 2600);
+    }
+
+    async function request(path, options = {}) {
+      const response = await fetch(path, options);
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "请求失败");
+      return payload;
+    }
+
+    function fillForm(settings) {
+      currentSettings = settings;
+      applyTheme(settings.theme);
+      const themeInput = document.querySelector(`input[name="theme"][value="${settings.theme}"]`);
+      if (themeInput) themeInput.checked = true;
+      const modeInput = document.querySelector(
+        `input[name="videoMode"][value="${settings.video_mode}"]`
+      );
+      if (modeInput) modeInput.checked = true;
+      document.querySelectorAll('input[name="modules"]').forEach((input) => {
+        input.checked = settings.modules.includes(input.value);
+      });
+      document.querySelectorAll('input[name="weekday"]').forEach((input) => {
+        input.checked = settings.weekdays.includes(input.value);
+      });
+      scheduleEnabled.checked = settings.schedule_enabled;
+      document.querySelector("#scheduleTime").value = settings.schedule_time;
+      document.querySelector("#maxScenes").value = settings.max_scenes;
+      document.querySelector("#bundlePath").value = settings.bundle_path;
+      document.querySelector("#tts").value = settings.tts;
+      document.querySelector("#voice").value = settings.voice;
+      voiceCloneEnabled.checked = settings.voice_clone_enabled;
+      voiceCloneFields.classList.toggle("disabled-group", !settings.voice_clone_enabled);
+      document.querySelector("#introVideo").value = settings.intro_video;
+      document.querySelector("#outroVideo").value = settings.outro_video;
+      document.querySelector("#voiceReferenceVideo").value = settings.voice_reference_video;
+      document.querySelector("#xttsLicenseAccepted").checked = settings.xtts_license_accepted;
+      document.querySelector("#xttsLicenseAccepted").closest(".module-option").hidden = true;
+      document.querySelector("#resolution").value = `${settings.width}x${settings.height}`;
+      document.querySelector("#fps").value = String(settings.fps);
+      document.querySelector("#subtitles").checked = settings.subtitles;
+      document.querySelector("#outputDir").value = settings.output_dir;
+      scheduleFields.classList.toggle("disabled-group", !settings.schedule_enabled);
+      translationEnabled.checked = settings.translation_enabled;
+      translationFields.classList.toggle("disabled-group", !settings.translation_enabled);
+      document.querySelector("#llmApiUrl").value = settings.llm_api_url;
+      document.querySelector("#llmModel").value = settings.llm_model;
+      document.querySelector("#llmApiKey").value = "";
+      document.querySelector("#llmApiKey").placeholder = settings.llm_api_key_set
+        ? "已配置，留空保持不变"
+        : "输入 API Key";
+      document.querySelector("#ocrPipelineVersion").value = settings.ocr_pipeline_version;
+      document.querySelector("#translationMaxChars").value = settings.translation_max_chars;
+      llmTestStatus.textContent = "尚未测试";
+      llmTestStatus.className = "llm-test-status";
+      updateStatus(settings);
+    }
+
+    function collectSettings() {
+      const [width, height] = document.querySelector("#resolution").value.split("x").map(Number);
+      return {
+        theme: selectedTheme(),
+        video_mode: document.querySelector('input[name="videoMode"]:checked')?.value || "long",
+        modules: [...document.querySelectorAll('input[name="modules"]:checked')].map((input) => input.value),
+        bundle_path: document.querySelector("#bundlePath").value.trim(),
+        output_dir: document.querySelector("#outputDir").value.trim(),
+        schedule_enabled: scheduleEnabled.checked,
+        schedule_time: document.querySelector("#scheduleTime").value,
+        weekdays: [...document.querySelectorAll('input[name="weekday"]:checked')].map((input) => input.value),
+        tts: document.querySelector("#tts").value,
+        voice: document.querySelector("#voice").value.trim(),
+        voice_clone_enabled: voiceCloneEnabled.checked,
+        xtts_license_accepted: document.querySelector("#xttsLicenseAccepted").checked,
+        intro_video: document.querySelector("#introVideo").value.trim(),
+        outro_video: document.querySelector("#outroVideo").value.trim(),
+        voice_reference_video: document.querySelector("#voiceReferenceVideo").value.trim(),
+        max_scenes: Number(document.querySelector("#maxScenes").value),
+        width,
+        height,
+        fps: Number(document.querySelector("#fps").value),
+        subtitles: document.querySelector("#subtitles").checked,
+        translation_enabled: translationEnabled.checked,
+        llm_api_url: document.querySelector("#llmApiUrl").value.trim(),
+        llm_model: document.querySelector("#llmModel").value.trim(),
+        llm_api_key: document.querySelector("#llmApiKey").value,
+        ocr_pipeline_version: document.querySelector("#ocrPipelineVersion").value,
+        translation_max_chars: Number(document.querySelector("#translationMaxChars").value)
+      };
+    }
+
+    function updateStatus(settings) {
+      const job = settings.job || { state: "idle", message: "等待运行" };
+      const jobState = document.querySelector("#jobState");
+      jobState.textContent = {
+        idle: "等待运行",
+        running: "生成中",
+        success: "已完成",
+        error: "运行失败"
+      }[job.state] || job.state;
+      jobState.className = `status-state ${job.state}`;
+      document.querySelector("#jobMessage").textContent = job.message || "";
+      const nextRun = settings.next_run
+        ? new Intl.DateTimeFormat("zh-CN", {
+            timeZone: "Asia/Shanghai",
+            month: "2-digit",
+            day: "2-digit",
+            weekday: "short",
+            hour: "2-digit",
+            minute: "2-digit"
+          }).format(new Date(settings.next_run))
+        : "未安排";
+      document.querySelector("#nextRunLabel").textContent = `下次运行：${nextRun}`;
+    }
+
+    async function saveSettings(showMessage = true) {
+      const settings = collectSettings();
+      const saved = await request("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settings)
+      });
+      currentSettings = saved;
+      if (showMessage) showToast("设置已保存");
+      return saved;
+    }
+
+    document.querySelectorAll('input[name="theme"]').forEach((input) => {
+      input.addEventListener("change", () => applyTheme(input.value));
+    });
+
+    document.querySelectorAll('input[name="videoMode"]').forEach((input) => {
+      input.addEventListener("change", () => {
+        if (input.value === "promo") {
+          document.querySelector("#resolution").value = "1080x1440";
+          document.querySelector("#maxScenes").value = Math.min(
+            6,
+            Number(document.querySelector("#maxScenes").value) || 6
+          );
+        } else {
+          document.querySelector("#maxScenes").value = 18;
+        }
+      });
+    });
+
+    scheduleEnabled.addEventListener("change", () => {
+      scheduleFields.classList.toggle("disabled-group", !scheduleEnabled.checked);
+    });
+
+    voiceCloneEnabled.addEventListener("change", () => {
+      voiceCloneFields.classList.toggle("disabled-group", !voiceCloneEnabled.checked);
+    });
+
+    translationEnabled.addEventListener("change", () => {
+      translationFields.classList.toggle("disabled-group", !translationEnabled.checked);
+      llmTestStatus.textContent = "尚未测试";
+      llmTestStatus.className = "llm-test-status";
+    });
+
+    testLlmButton.addEventListener("click", async () => {
+      try {
+        testLlmButton.disabled = true;
+        llmTestStatus.textContent = "测试中";
+        llmTestStatus.className = "llm-test-status";
+        const result = await request("/api/test-llm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            llm_api_url: document.querySelector("#llmApiUrl").value.trim(),
+            llm_model: document.querySelector("#llmModel").value.trim(),
+            llm_api_key: document.querySelector("#llmApiKey").value
+          })
+        });
+        llmTestStatus.textContent = `连接正常 · ${result.latency_ms} ms`;
+        llmTestStatus.className = "llm-test-status success";
+        showToast("大模型连接正常");
+      } catch (error) {
+        llmTestStatus.textContent = "连接失败";
+        llmTestStatus.className = "llm-test-status error";
+        showToast(error.message);
+      } finally {
+        testLlmButton.disabled = false;
+      }
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      try {
+        setBusy(true);
+        await saveSettings();
+      } catch (error) {
+        showToast(error.message);
+      } finally {
+        setBusy(false);
+      }
+    });
+
+    runButton.addEventListener("click", async () => {
+      try {
+        setBusy(true);
+        await saveSettings(false);
+        await request("/api/run", { method: "POST", body: "{}" });
+        showToast("任务已启动");
+        await pollStatus();
+      } catch (error) {
+        showToast(error.message);
+      } finally {
+        setBusy(false);
+      }
+    });
+
+    async function pollStatus() {
+      try {
+        const settings = await request("/api/status");
+        updateStatus(settings);
+        if (settings.job?.state === "running") {
+          setTimeout(pollStatus, 1800);
+        }
+      } catch (error) {
+        showToast(error.message);
+      }
+    }
+
+    request("/api/settings")
+      .then(fillForm)
+      .catch((error) => showToast(error.message));
+    setInterval(pollStatus, 10000);
+  </script>
+</body>
+</html>
